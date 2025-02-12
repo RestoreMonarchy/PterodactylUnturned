@@ -1,0 +1,11 @@
+{
+	"Name": "PterodactylUnturned",
+	"Version": "1.0.0",
+	"Assemblies":
+	[
+		{
+			"Path": "/PterodactylUnturned.dll",
+			"Role": "Server"
+		}
+	]
+}
