@@ -1,60 +1,94 @@
-name: Build and Release
-
+name: Build & Release
 on:
+  workflow_call:
   push:
-    paths:
-      - 'PterodactylUnturned.csproj'
-  workflow_dispatch:
+    branches:
+      - master
 
 jobs:
   build:
+    name: Create GitHub Release
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+   
+      - name: Get version
+        id: package_version
+        uses: KageKirin/get-csproj-version@v0
+        with:
+          file: ./${{ github.event.repository.name }}/${{ github.event.repository.name }}.csproj
 
-    - name: Install dependencies
-      run: sudo apt-get install -y libssl-dev
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+         
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Set up .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Install zip
+        run: sudo apt-get install zip
 
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
+      - name: Create release directory and copy files
+        run: |
+          mkdir -p ./release/${{ github.event.repository.name }}
+          find ./${{ github.event.repository.name }}/bin/Release/net48 -type f ! -name "*.pdb" -exec cp {} ./release/${{ github.event.repository.name }}/ \;
+          cd ./release/
+          zip -qr ./../release.zip *
+        shell: bash
+       
+      - name: Check tag
+        id: check_tag
+        uses: mukunku/tag-exists-action@v1.6.0
+        with:
+          tag: v${{ steps.package_version.outputs.version }}
 
-    - name: Create output directory
-      run: mkdir -p PterodactylUnturned
+      - name: Get last commit message
+        id: get_last_commit
+        run: echo "::set-output name=message::$(git log -1 --pretty=%B)"
+       
+      - name: Create release
+        id: create_release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.package_version.outputs.version }}
+          release_name: "${{ github.event.repository.name }} v${{ steps.package_version.outputs.version }}"
+          body: "${{ steps.get_last_commit.outputs.message }}"
+          draft: true
+          prerelease: false
+     
+      - name: Upload release asset
+        id: upload_asset
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release.zip
+          asset_name: "${{ github.event.repository.name }}-v${{ steps.package_version.outputs.version }}.zip"
+          asset_content_type: application/zip
 
-    - name: Move build files
-      run: |
-        mv bin/Release/net48/* PterodactylUnturned/
-        find PterodactylUnturned/ -name '*.pdb' -delete
+      - name: Upload Release Assets
+        id: upload-release-assets
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: dwenegar/upload-release-assets@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.create_release.outputs.id }}
+          assets_path: ./*.unitypackage
 
-    - name: Create zip archive
-      run: zip -r PterodactylUnturned.zip PterodactylUnturned/
-
-    - name: Check version change
-      id: version_check
-      run: |
-        VERSION=$(grep '<Version>' PterodactylUnturned.csproj | sed 's/<[^>]*>//g' | xargs)
-        echo "::set-output name=version::$VERSION"
-
-    - name: Create Release
-      if: github.ref == 'refs/heads/main'
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ steps.version_check.outputs.version }}
-        release_name: Release ${{ steps.version_check.outputs.version }}
-        body: |
-          Release of version ${{ steps.version_check.outputs.version }}
-        draft: false
-        prerelease: false
-        files: PterodactylUnturned.zip
+      - uses: eregon/publish-release@v1
+        if: steps.check_tag.outputs.exists == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.create_release.outputs.id }}
