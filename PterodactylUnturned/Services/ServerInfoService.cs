@@ -17,6 +17,11 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
 
         private float UpdateInterval => PterodactylUnturnedModule.Config.UpdateInterval;
 
+        void Awake() 
+        {
+            DontDestroyOnLoad(this.gameObject);
+        }
+
         void Start()
         {
             InvokeRepeating(nameof(UpdateServerInfo), 0, UpdateInterval);
