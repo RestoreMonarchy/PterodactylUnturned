@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'PterodactylUnturned.csproj'
+  workflow_dispatch:
 
 jobs:
   build:
