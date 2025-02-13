@@ -1,0 +1,56 @@
+name: Build and Release
+
+on:
+  push:
+    paths:
+      - 'PterodactylUnturned.csproj'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Create output directory
+      run: mkdir -p PterodactylUnturned
+
+    - name: Move build files
+      run: |
+        mv bin/Release/net48/* PterodactylUnturned/
+        find PterodactylUnturned/ -name '*.pdb' -delete
+
+    - name: Create zip archive
+      run: zip -r PterodactylUnturned.zip PterodactylUnturned/
+
+    - name: Check version change
+      id: version_check
+      run: |
+        VERSION=$(grep '<Version>' PterodactylUnturned.csproj | sed 's/<[^>]*>//g' | xargs)
+        echo "::set-output name=version::$VERSION"
+
+    - name: Create Release
+      if: github.ref == 'refs/heads/main'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.version_check.outputs.version }}
+        release_name: Release ${{ steps.version_check.outputs.version }}
+        body: |
+          Release of version ${{ steps.version_check.outputs.version }}
+        draft: false
+        prerelease: false
+        files: PterodactylUnturned.zip
