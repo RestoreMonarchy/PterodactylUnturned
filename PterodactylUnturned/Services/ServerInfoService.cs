@@ -15,7 +15,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
         private string ServerInfoPath => Path.Combine(Directory, "server.json");
         private string PlayersInfoPath => Path.Combine(Directory, "players.json");
 
-        private const float UpdateInterval = 2;
+        private float UpdateInterval => PterodactylUnturnedModule.Config.UpdateInterval;
 
         void Start()
         {
