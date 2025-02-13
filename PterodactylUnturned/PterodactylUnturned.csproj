@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-	<LangVersion>latest</LangVersion>
-	<RootNamespace>RestoreMonarchy.PterodactylUnturned</RootNamespace>
-    <Version>0.0.2</Version>
+	  <LangVersion>latest</LangVersion>
+	  <RootNamespace>RestoreMonarchy.PterodactylUnturned</RootNamespace>
+    <Version>0.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
