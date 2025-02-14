@@ -4,10 +4,11 @@
     <TargetFramework>net48</TargetFramework>
 	  <LangVersion>latest</LangVersion>
 	  <RootNamespace>RestoreMonarchy.PterodactylUnturned</RootNamespace>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
+	  <PackageReference Include="RestoreMonarchy.RocketRedist" Version="3.*" ExcludeAssets="runtime" />
 	  <PackageReference Include="RestoreMonarchy.UnturnedRedist" Version="3.*" ExcludeAssets="runtime" />
   </ItemGroup>
 

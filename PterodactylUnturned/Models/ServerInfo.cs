@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace RestoreMonarchy.PterodactylUnturned.Models
 {
@@ -11,8 +12,12 @@ namespace RestoreMonarchy.PterodactylUnturned.Models
         public int MaxPlayers { get; set; }
         public string Map { get; set; }
         public string ThumbnailUrl { get; set; }
+        public bool IsRocketEnabled { get; set; }
+        public RocketInfo RocketInfo { get; set; }
 
         public DateTime LastUpdate { get; set; }
         public DateTime NextUpdate { get; set; }
+
+        public List<PlayerInfo> PlayerList { get; set; }
     }
 }

@@ -8,5 +8,6 @@
         public string SteamName { get; set; }
         public int Playtime { get; set; }
         public int Ping { get; set; }
+        public bool IsGold { get; set; }
     }
 }
