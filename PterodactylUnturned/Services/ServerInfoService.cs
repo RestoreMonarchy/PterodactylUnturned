@@ -46,7 +46,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
 
             ServerInfo serverInfo = new()
             {
-                SteamId = steamId,
+                SteamId = steamId.ToString(),
                 Name = Provider.serverName,
                 Players = Provider.clients.Count,
                 PendingPlayers = Provider.pending.Count,

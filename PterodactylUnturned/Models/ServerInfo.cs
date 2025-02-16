@@ -5,7 +5,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Models
 {
     public class ServerInfo
     {
-        public ulong SteamId { get; set; }
+        public string SteamId { get; set; }
         public string Name { get; set; }
         public int Players { get; set; }
         public int PendingPlayers { get; set; }
