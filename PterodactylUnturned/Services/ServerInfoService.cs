@@ -73,7 +73,8 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                     IsGold = player.isPro,
                     IsAdmin = player.isAdmin,
                     SkinColor = ColorUtility.ToHtmlStringRGB(player.skin),
-                    Face = player.face
+                    Face = player.face,
+                    Health = player.player.life.health
                 };
 
                 serverInfo.PlayerList.Add(playerInfo);

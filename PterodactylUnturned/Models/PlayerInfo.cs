@@ -12,5 +12,6 @@
         public bool IsAdmin { get; set; }
         public string SkinColor { get; set; }
         public int Face { get; set; }
+        public int Health { get; set; }
     }
 }
