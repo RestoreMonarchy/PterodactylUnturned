@@ -4,8 +4,9 @@
     {
         public string Name { get; set; }
         public string Version { get; set; }
-        public string ConfigurationPath { get; set; }
-        public string TranslationsPath { get; set; }
+        public string DirectoryPath { get; set; }
+        public string ConfigurationFileName { get; set; }
+        public string TranslationsFileName { get; set; }
         public string State { get; set; }
     }
 }

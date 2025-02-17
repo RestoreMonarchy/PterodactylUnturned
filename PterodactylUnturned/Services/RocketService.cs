@@ -1,9 +1,12 @@
 ﻿using RestoreMonarchy.PterodactylUnturned.Models;
 using Rocket.API;
 using Rocket.Core;
+using Rocket.Core.Plugins;
+using Rocket.Unturned;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace RestoreMonarchy.PterodactylUnturned.Services
 {
@@ -21,8 +24,8 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
 
             RocketInfo rocketInfo = new()
             {
-                Version = typeof(R).GetType().Assembly.GetName().Version.ToString(),
-                PermissionsPath = Path.Combine(rocketDirectory, Rocket.Core.Environment.PermissionFile),
+                Version = typeof(U).GetType().Assembly.GetName().Version.ToString(),
+                DirectoryPath = rocketDirectory,
                 Libraries = new(),
                 Plugins = new()
             };
@@ -35,19 +38,40 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                 string translationsFileName = string.Format(Rocket.Core.Environment.PluginTranslationFileTemplate, plugin.Name, R.Settings.Instance.LanguageCode);
 
                 bool hasConfiguration = plugin.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRocketPlugin<>));
-
+                bool hasTranslations = plugin.DefaultTranslations.Any();
+    
                 PluginInfo pluginInfo = new()
                 {
                     Name = plugin.Name,
                     Version = plugin.GetType().Assembly.GetName().Version.ToString(),
-                    TranslationsPath = plugin.DefaultTranslations.Any() ? Path.Combine(pluginDirectory, translationsFileName) : null,
-                    ConfigurationPath = hasConfiguration ? Path.Combine(pluginDirectory, configurationFileName) : null,
+                    DirectoryPath = pluginDirectory,
+                    TranslationsFileName = hasTranslations ? translationsFileName : null,
+                    ConfigurationFileName = hasConfiguration ? configurationFileName : null,
                     State = plugin.State.ToString()
                 };
                 rocketInfo.Plugins.Add(pluginInfo);
             }
+            
+            Dictionary<AssemblyName, string> libraries;
 
+            FieldInfo librariesField = typeof(RocketPluginManager).GetField("libraries", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (librariesField != null) {
+                libraries = librariesField.GetValue(R.Plugins) as Dictionary<AssemblyName, string>;
+            } else {
+                libraries = new();
+            }
 
+            foreach (KeyValuePair<AssemblyName, string> library in libraries)
+            {
+                LibraryInfo libraryInfo = new()
+                {
+                    Name = library.Key.Name,
+                    Version = library.Key.Version.ToString(),
+                    Path = library.Value,
+                    FileName = Path.GetFileName(library.Value)
+                };
+                rocketInfo.Libraries.Add(libraryInfo);
+            }
 
             return rocketInfo;
         }
