@@ -24,7 +24,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
 
             RocketInfo rocketInfo = new()
             {
-                DirectoryPath = rocketDirectory,
+                DirectoryPath = rocketDirectory.TrimEnd('/'),
                 Libraries = new(),
                 Plugins = new()
             };
@@ -73,11 +73,17 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                 }
 
                 FileInfo fileInfo = new(library.Value);
+
+                string directoryPath = fileInfo.DirectoryName;
+                if (directoryPath.StartsWith("/home/container/"))
+                {
+                    directoryPath = directoryPath.Substring("/home/container/".Length);
+                }
                 LibraryInfo libraryInfo = new()
                 {
                     Name = library.Key.Name,
                     Version = library.Key.Version.ToString(),
-                    DirectoryPath = fileInfo.Directory.FullName,
+                    DirectoryPath = directoryPath,
                     FileName = fileInfo.Name
                 };
                 rocketInfo.Libraries.Add(libraryInfo);
