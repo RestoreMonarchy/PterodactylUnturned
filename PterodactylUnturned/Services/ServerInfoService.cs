@@ -64,13 +64,16 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
             {
                 PlayerInfo playerInfo = new()
                 {
-                    SteamId = player.playerID.steamID.m_SteamID,
+                    SteamId = player.playerID.steamID.ToString(),
                     SteamName = player.playerID.playerName,
                     CharacterName = player.playerID.characterName,
-                    GroupId = player.player.quests.groupID.m_SteamID,
+                    GroupId = player.player.quests.groupID.ToString(),
                     Ping = (int)(player.ping * 1000),
                     Playtime = (int)(Time.realtimeSinceStartup - player.joined),
-                    IsGold = player.isPro
+                    IsGold = player.isPro,
+                    IsAdmin = player.isAdmin,
+                    SkinColor = ColorUtility.ToHtmlStringRGB(player.skin),
+                    Face = player.face
                 };
 
                 serverInfo.PlayerList.Add(playerInfo);
