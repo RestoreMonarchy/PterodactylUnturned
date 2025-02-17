@@ -24,15 +24,19 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
 
             RocketInfo rocketInfo = new()
             {
-                Version = typeof(U).GetType().Assembly.GetName().Version.ToString(),
                 DirectoryPath = rocketDirectory,
                 Libraries = new(),
                 Plugins = new()
             };
 
             List<IRocketPlugin> plugins = R.Plugins.GetPlugins();
+            List<string> pluginFullNames = new();
             foreach (IRocketPlugin plugin in plugins)
             {
+                Assembly assembly = plugin.GetType().Assembly;
+                AssemblyName assemblyName = assembly.GetName();
+                pluginFullNames.Add(assemblyName.FullName);
+
                 string pluginDirectory = Path.Combine(pluginsDirectory, plugin.Name);
                 string configurationFileName = string.Format(Rocket.Core.Environment.PluginConfigurationFileTemplate, plugin.Name);
                 string translationsFileName = string.Format(Rocket.Core.Environment.PluginTranslationFileTemplate, plugin.Name, R.Settings.Instance.LanguageCode);
@@ -43,7 +47,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                 PluginInfo pluginInfo = new()
                 {
                     Name = plugin.Name,
-                    Version = plugin.GetType().Assembly.GetName().Version.ToString(),
+                    Version = assemblyName.Version.ToString(),
                     DirectoryPath = pluginDirectory,
                     TranslationsFileName = hasTranslations ? translationsFileName : null,
                     ConfigurationFileName = hasConfiguration ? configurationFileName : null,
@@ -63,12 +67,18 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
 
             foreach (KeyValuePair<AssemblyName, string> library in libraries)
             {
+                if (pluginFullNames.Contains(library.Key.FullName))
+                {
+                    continue;
+                }
+
+                FileInfo fileInfo = new(library.Value);
                 LibraryInfo libraryInfo = new()
                 {
                     Name = library.Key.Name,
                     Version = library.Key.Version.ToString(),
-                    Path = library.Value,
-                    FileName = Path.GetFileName(library.Value)
+                    DirectoryPath = fileInfo.Directory.FullName,
+                    FileName = fileInfo.Name
                 };
                 rocketInfo.Libraries.Add(libraryInfo);
             }
