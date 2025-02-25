@@ -57,6 +57,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                 NextUpdate = DateTime.UtcNow.AddSeconds(UpdateInterval),
                 PlayerList = new(),
                 IsRocketEnabled = isRocketEnabled,
+                IsFakeIPEnabled = Provider.configData.Server.Use_FakeIP,
                 RocketInfo = isRocketReady ? RocketService.GetRocketInfo() : null
             };
 

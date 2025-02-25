@@ -13,6 +13,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Models
         public string Map { get; set; }
         public string ThumbnailUrl { get; set; }
         public bool IsRocketEnabled { get; set; }
+        public bool IsFakeIPEnabled { get; set; }
         public RocketInfo RocketInfo { get; set; }
 
         public DateTime LastUpdate { get; set; }
