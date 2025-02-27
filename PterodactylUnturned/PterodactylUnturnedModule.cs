@@ -35,6 +35,12 @@ namespace RestoreMonarchy.PterodactylUnturned
                 Config = new();
             }
 
+            if (Config.AutomaticallyEnableFakeIP && !Provider.configData.Server.Use_FakeIP)
+            {
+                Provider.configData.Server.Use_FakeIP = true;
+                Logs.printLine("Automatically enabled FakeIP");
+            }
+
             gameObject = new GameObject();
             gameObject.AddComponent<ServerInfoService>();
         }
