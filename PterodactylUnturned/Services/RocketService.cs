@@ -88,11 +88,13 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
             foreach (KeyValuePair<AssemblyName, string> library in libraries)
             {
                 string fullName;
+                string name;
                 string version;
 
                 try
                 {
                     fullName = library.Key.FullName;
+                    name = library.Key.Name;
                     version = library.Key.Version.ToString();
                 } catch (Exception)
                 {
@@ -120,7 +122,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                 }
                 LibraryInfo libraryInfo = new()
                 {
-                    Name = fullName,
+                    Name = name,
                     Version = version,
                     DirectoryPath = directoryPath,
                     FileName = fileInfo.Name
