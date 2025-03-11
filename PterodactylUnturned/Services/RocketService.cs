@@ -3,6 +3,7 @@ using Rocket.API;
 using Rocket.Core;
 using Rocket.Core.Plugins;
 using Rocket.Unturned;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,25 +34,44 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
             List<string> pluginFullNames = new();
             foreach (IRocketPlugin plugin in plugins)
             {
-                Assembly assembly = plugin.GetType().Assembly;
-                AssemblyName assemblyName = assembly.GetName();
-                pluginFullNames.Add(assemblyName.FullName);
+                string pluginName;
+                string version;
+                string pluginState;
 
-                string pluginDirectory = Path.Combine(pluginsDirectory, plugin.Name);
-                string configurationFileName = string.Format(Rocket.Core.Environment.PluginConfigurationFileTemplate, plugin.Name);
-                string translationsFileName = string.Format(Rocket.Core.Environment.PluginTranslationFileTemplate, plugin.Name, R.Settings.Instance.LanguageCode);
+                bool hasConfiguration;
+                bool hasTranslations;
+                
+                try
+                {
+                    pluginName = plugin.Name;
+                    Assembly assembly = plugin.GetType().Assembly;
+                    AssemblyName assemblyName = assembly.GetName();
+                    version = assemblyName.Version.ToString();
+                    pluginState = plugin.State.ToString();
 
-                bool hasConfiguration = plugin.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRocketPlugin<>));
-                bool hasTranslations = plugin.DefaultTranslations.Any();
+                    hasConfiguration = plugin.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IRocketPlugin<>));
+                    hasTranslations = plugin.DefaultTranslations?.Any() ?? false;
+
+                    pluginFullNames.Add(assemblyName.FullName);
+                } catch (Exception)
+                {
+                    // Sometimes when dll is replaced AssemblyName throws random exceptions
+                    continue;
+                }
+                
+
+                string pluginDirectory = Path.Combine(pluginsDirectory, pluginName);
+                string configurationFileName = string.Format(Rocket.Core.Environment.PluginConfigurationFileTemplate, pluginName);
+                string translationsFileName = string.Format(Rocket.Core.Environment.PluginTranslationFileTemplate, pluginName, R.Settings.Instance.LanguageCode);
     
                 PluginInfo pluginInfo = new()
                 {
-                    Name = plugin.Name,
-                    Version = assemblyName.Version.ToString(),
+                    Name = pluginName,
+                    Version = version,
                     DirectoryPath = pluginDirectory,
                     TranslationsFileName = hasTranslations ? translationsFileName : null,
                     ConfigurationFileName = hasConfiguration ? configurationFileName : null,
-                    State = plugin.State.ToString()
+                    State = pluginState
                 };
                 rocketInfo.Plugins.Add(pluginInfo);
             }
@@ -67,12 +87,31 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
 
             foreach (KeyValuePair<AssemblyName, string> library in libraries)
             {
-                if (pluginFullNames.Contains(library.Key.FullName))
+                string fullName;
+                string version;
+
+                try
+                {
+                    fullName = library.Key.FullName;
+                    version = library.Key.Version.ToString();
+                } catch (Exception)
+                {
+                    // Sometimes when dll is replaced AssemblyName throws random exceptions
+                    continue;
+                }
+                
+
+                if (pluginFullNames.Contains(fullName))
                 {
                     continue;
                 }
 
                 FileInfo fileInfo = new(library.Value);
+
+                if (!fileInfo.Exists)
+                {
+                    continue;
+                }
 
                 string directoryPath = fileInfo.DirectoryName;
                 if (directoryPath.StartsWith("/home/container/"))
@@ -81,8 +120,8 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                 }
                 LibraryInfo libraryInfo = new()
                 {
-                    Name = library.Key.Name,
-                    Version = library.Key.Version.ToString(),
+                    Name = fullName,
+                    Version = version,
                     DirectoryPath = directoryPath,
                     FileName = fileInfo.Name
                 };
