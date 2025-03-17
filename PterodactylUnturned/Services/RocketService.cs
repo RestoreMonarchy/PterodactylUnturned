@@ -20,6 +20,11 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
 
         internal static RocketInfo GetRocketInfo()
         {
+            if (string.IsNullOrEmpty(Rocket.Unturned.Environment.RocketDirectory))
+            {
+                return null;
+            }
+
             string rocketDirectory = Rocket.Unturned.Environment.RocketDirectory;
             string pluginsDirectory = Path.Combine(Rocket.Unturned.Environment.RocketDirectory, Rocket.Core.Environment.PluginsDirectory);
 
@@ -59,6 +64,10 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                     continue;
                 }
                 
+                if (string.IsNullOrEmpty(pluginName))
+                {
+                    continue;
+                }
 
                 string pluginDirectory = Path.Combine(pluginsDirectory, pluginName);
                 string configurationFileName = string.Format(Rocket.Core.Environment.PluginConfigurationFileTemplate, pluginName);
