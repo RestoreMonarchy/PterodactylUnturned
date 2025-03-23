@@ -58,7 +58,8 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                 PlayerList = new(),
                 IsRocketEnabled = isRocketEnabled,
                 IsFakeIPEnabled = Provider.configData.Server.Use_FakeIP,
-                RocketInfo = isRocketReady ? RocketService.GetRocketInfo() : null
+                RocketInfo = isRocketReady ? RocketService.GetRocketInfo() : null,
+                WorkshopFileIds = Provider.getServerWorkshopFileIDs()
             };
 
             foreach (SteamPlayer player in Provider.clients)

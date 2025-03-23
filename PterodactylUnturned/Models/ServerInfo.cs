@@ -15,6 +15,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Models
         public bool IsRocketEnabled { get; set; }
         public bool IsFakeIPEnabled { get; set; }
         public RocketInfo RocketInfo { get; set; }
+        public List<ulong> WorkshopFileIds { get; set; }
 
         public DateTime LastUpdate { get; set; }
         public DateTime NextUpdate { get; set; }
