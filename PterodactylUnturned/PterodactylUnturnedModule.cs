@@ -12,6 +12,16 @@ namespace RestoreMonarchy.PterodactylUnturned
     {
         public static PterodactylUnturnedConfig Config { get; private set; }
 
+        public static string Directory => Path.Combine(UnturnedPaths.RootDirectory.FullName, "PterodactylAPI");
+
+        internal static void EnsureDirectoryExists()
+        {
+            if (!System.IO.Directory.Exists(Directory))
+            {
+                System.IO.Directory.CreateDirectory(Directory);
+            }
+        }
+
         private GameObject gameObject;
 
         public void initialize()
@@ -40,6 +50,10 @@ namespace RestoreMonarchy.PterodactylUnturned
                 Provider.configData.Server.Use_FakeIP = true;
                 Logs.printLine("Automatically enabled FakeIP");
             }
+
+            ConfigDataService.GenerateConfigSchema();
+
+            
 
             gameObject = new GameObject();
             gameObject.AddComponent<ServerInfoService>();

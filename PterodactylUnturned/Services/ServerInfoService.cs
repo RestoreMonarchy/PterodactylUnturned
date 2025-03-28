@@ -10,9 +10,8 @@ using UnityEngine;
 namespace RestoreMonarchy.PterodactylUnturned.Services
 {
     public class ServerInfoService : MonoBehaviour
-    {
-        private string Directory => Path.Combine(UnturnedPaths.RootDirectory.FullName, "PterodactylAPI");
-        private string ServerInfoPath => Path.Combine(Directory, "server.json");
+    {        
+        private string ServerInfoPath => Path.Combine(PterodactylUnturnedModule.Directory, "server.json");
 
         private float UpdateInterval => PterodactylUnturnedModule.Config.UpdateInterval;
 
@@ -82,10 +81,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                 serverInfo.PlayerList.Add(playerInfo);
             }
 
-            if (!System.IO.Directory.Exists(Directory))
-            {
-                System.IO.Directory.CreateDirectory(Directory);
-            }
+            PterodactylUnturnedModule.EnsureDirectoryExists();
 
             string serverJson = JsonConvert.SerializeObject(serverInfo, Formatting.Indented);
             File.WriteAllText(ServerInfoPath, serverJson);
