@@ -16,7 +16,13 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
             {
                 ConfigData configData = ConfigData.CreateDefault(false);
 
-                string xmlPath = Path.Combine(UnturnedPaths.RootDirectory.FullName, "Unturned_Data", "Managed", "Assembly-CSharp.xml");
+                string unturnedDataDirectory = Path.Combine(UnturnedPaths.RootDirectory.FullName, "Unturned_Headless_Data");
+                if (!Directory.Exists(unturnedDataDirectory))
+                {
+                    unturnedDataDirectory = Path.Combine(UnturnedPaths.RootDirectory.FullName, "Unturned_Data");
+                }
+
+                string xmlPath = Path.Combine(unturnedDataDirectory, "Managed", "Assembly-CSharp.xml");
                 CustomSchemaGenerator generator = new(xmlPath);
 
                 // Generate the schema
