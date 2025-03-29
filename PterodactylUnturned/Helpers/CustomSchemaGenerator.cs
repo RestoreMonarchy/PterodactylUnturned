@@ -12,7 +12,6 @@ namespace RestoreMonarchy.PterodactylUnturned.Helpers
     public class CustomSchemaGenerator
     {
         private readonly XDocument _xmlDoc;
-        private readonly HashSet<Type> _processedTypes = new HashSet<Type>();
 
         public CustomSchemaGenerator(string xmlDocPath)
         {
@@ -24,7 +23,6 @@ namespace RestoreMonarchy.PterodactylUnturned.Helpers
 
         public string GenerateSchema<T>(T instance = default)
         {
-            _processedTypes.Clear();
             var type = typeof(T);
 
             object defaultInstance = instance;
@@ -39,18 +37,6 @@ namespace RestoreMonarchy.PterodactylUnturned.Helpers
 
         private JObject GenerateSchemaForType(Type type, object instance)
         {
-            if (_processedTypes.Contains(type))
-            {
-                // To prevent circular references, just return a reference schema
-                return new JObject
-                {
-                    ["type"] = "object",
-                    ["title"] = type.Name
-                };
-            }
-
-            _processedTypes.Add(type);
-
             var schema = new JObject
             {
                 ["title"] = type.Name,
