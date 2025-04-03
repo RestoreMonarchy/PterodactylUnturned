@@ -51,6 +51,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Services
                 PendingPlayers = Provider.pending.Count,
                 MaxPlayers = Provider.maxPlayers,
                 Map = Level.info?.name ?? Provider.map,
+                Mode = Provider.mode.ToString(),
                 ThumbnailUrl = Provider.configData.Browser.Thumbnail,
                 LastUpdate = DateTime.UtcNow,
                 NextUpdate = DateTime.UtcNow.AddSeconds(UpdateInterval),

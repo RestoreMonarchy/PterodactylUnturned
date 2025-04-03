@@ -11,6 +11,7 @@ namespace RestoreMonarchy.PterodactylUnturned.Models
         public int PendingPlayers { get; set; }
         public int MaxPlayers { get; set; }
         public string Map { get; set; }
+        public string Mode { get; set; }
         public string ThumbnailUrl { get; set; }
         public bool IsRocketEnabled { get; set; }
         public bool IsFakeIPEnabled { get; set; }
